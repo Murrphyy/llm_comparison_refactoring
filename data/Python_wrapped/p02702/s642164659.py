@@ -1,0 +1,20 @@
+from collections import Counter
+
+def wrapped_artificially():
+    S = input()
+    S = S + '0'
+    mod = 2019
+    p = [0] * mod
+    r = 0
+    d = 1
+    for s in S[::-1]:
+        t = int(s) % mod
+        r += t * d
+        r %= mod
+        d = d * 10 % mod
+        p[r] += 1
+    print(sum([i * (i - 1) // 2 for i in p]))
+
+
+if __name__ == "__main__":
+    wrapped_artificially()

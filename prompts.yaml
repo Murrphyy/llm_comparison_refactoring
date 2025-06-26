@@ -1,0 +1,137 @@
+prompting_type: "rci" # options : few_shot, zero_shot, rci
+
+generic_prompts_extract_method:
+  system: "You are an assistant to help developers to refactor their Python codes. While refactoring you should always consider if the given code is a good candidate for an extract method refactoring or not."
+  part1: "Code : "
+  part2: "Now create the extract method refactoring version of this code."
+
+generic_prompts_rename_method:
+  system: "You are an assistant to help developers to rename their methods so that the understandability of their code increases. You will get the problem definition and the existing implementation of a solution. You need to offer new names for the methods other than the main function. You can leave a method's name as is if you can not find a better name for it."
+  part1: "Definition of the problem : "
+  part2: "Existing implementation of a solution : "
+
+few_shot_examples_extract_method:
+  - input: |
+      from enum import Enum
+
+      class Category(Enum):
+          A = 1
+          B = 2
+          C = 3
+
+      def wrapped_artificially(category, income):
+          if category == Category.A:
+              discount = 10
+          elif category == Category.B:
+              discount = 5
+          else:
+              discount = 0
+          return income * (100 - discount) / 100
+    
+      if __name__ == "__main__":
+          wrapped_artificially()
+    output: |
+      from enum import Enum
+
+      class Category(Enum):
+          A = 1
+          B = 2
+          C = 3
+
+      def calc_discount(category):
+          if category == Category.A:
+              discount = 10
+          elif category == Category.B:
+              discount = 5
+          else:
+              discount = 0
+          return discount
+
+      def wrapped_artificially(category, income):
+          discount = calc_discount(category)
+          return income * (100 - discount) / 100
+
+      if __name__ == "__main__":
+          wrapped_artificially()
+
+few_shot_examples_rename_method:
+  - problem_definition: |
+      Consider a grid with H rows and W columns of squares. Let (r, c) denote the square at the r-th row from the top and the c-th column from the left. Each square is painted black or white.
+
+      The grid is said to be good if and only if the following condition is satisfied:
+
+      From (1, 1), we can reach (H, W) by moving one square right or down repeatedly, while always being on a white square.
+      Note that (1, 1) and (H, W) must be white if the grid is good.
+
+      Your task is to make the grid good by repeating the operation below. Find the minimum number of operations needed to complete the task. It can be proved that you can always complete the task in a finite number of operations.
+
+      Choose four integers r_0, c_0, r_1, c_1(1 < r_0 < r_1 < H, 1 < c_0 < c_1 < W). For each pair r, c (r_0 < r < r_1, c_0 < c < c_1), invert the color of (r, c) - that is, from white to black and vice versa.
+    input: |
+      h, w = map(int, input().split())
+      s = [list(input()) for _ in range(h)]
+      cnt = [[float('inf')] * w for _ in range(h)]
+
+      def calculate_min_count(y, x):
+          global cnt, s, h, w
+          for dy, dx in [[1, 0], [0, 1]]:
+              next_y = y + dy
+              next_x = x + dx
+              if next_x < w and next_y < h:
+                  if s[y][x] == s[next_y][next_x]:
+                      cnt[next_y][next_x] = min(cnt[next_y][next_x], cnt[y][x])
+                  else:
+                      cnt[next_y][next_x] = min(cnt[next_y][next_x], cnt[y][x] + 1)
+
+      def wrapped_artificially():
+          global cnt, s, h, w
+          if s[0][0] == '.':
+              cnt[0][0] = 0
+          else:
+              cnt[0][0] = 1
+          for i in range(h):
+              for j in range(w):
+                  calculate_min_count(i, j)
+          if s[-1][-1] == '#':
+              cnt[-1][-1] += 1
+          print(cnt[-1][-1] // 2)
+
+
+      if __name__ == "__main__":
+          wrapped_artificially()
+    output: |
+      h, w = map(int, input().split())
+      grid = [list(input()) for _ in range(h)]
+      min_operations = [[float('inf')] * w for _ in range(h)]
+
+      def compute_min_operations(row, column):
+          global min_operations, grid, h, w
+          for dy, dx in [[1, 0], [0, 1]]:
+              next_row = row + dy
+              next_column = column + dx
+              if next_column < w and next_row < h:
+                  if grid[row][column] == grid[next_row][next_column]:
+                      min_operations[next_row][next_column] = min(min_operations[next_row][next_column], min_operations[row][column])
+                  else:
+                      min_operations[next_row][next_column] = min(min_operations[next_row][next_column], min_operations[row][column] + 1)
+
+      def optimize_grid_artificially():
+          global min_operations, grid, h, w
+          if grid[0][0] == '.':
+              min_operations[0][0] = 0
+          else:
+              min_operations[0][0] = 1
+          for y in range(h):
+              for x in range(w):
+                  compute_min_operations(y, x)
+          if grid[-1][-1] == '#':
+              min_operations[-1][-1] += 1
+          print(min_operations[-1][-1] // 2)
+
+
+      if __name__ == "__main__":
+          optimize_grid_artificially()
+
+rci:
+  part1: "Your code can not pass the test cases. Expected outcome of the test case is"
+  part2: "but your code gives the following :"
+  part3: "Now correct your code, it has to pass the test cases like the existing implementation code."

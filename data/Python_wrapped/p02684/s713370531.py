@@ -1,0 +1,35 @@
+def main():
+    n, k = map(int, input().split())
+    inlis = list(map(int, input().split()))
+    flag = 0
+    trans = 0
+    now = 1
+    indic = dict()
+    indic[1] = 0
+    while flag < 1:
+        if trans < k:
+            trans += 1
+            tsugi = inlis[now - 1]
+            now = tsugi
+            if tsugi not in indic:
+                indic[tsugi] = trans
+            else:
+                flag = 1
+                loop = trans - indic[tsugi]
+                yokei = indic[tsugi]
+        if trans == k:
+            print(tsugi)
+            exit()
+    loopamari = (k - yokei) % loop
+    for _ in range(loopamari):
+        tsugi = inlis[now - 1]
+        now = tsugi
+    print(now)
+
+def wrapped_artificially():
+    if __name__ == '__main__':
+        main()
+
+
+if __name__ == "__main__":
+    wrapped_artificially()
